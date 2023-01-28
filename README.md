@@ -1,2 +1,2 @@
-# gw2-identified
+Identified
 Inventory and finance tool
