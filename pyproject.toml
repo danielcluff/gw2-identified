@@ -1,0 +1,18 @@
+[project]
+name = "identified"
+version = "1.0.0"
+description = "Unidentied salvage tracking app for GW2."
+dependencies = [
+  "flask",
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backent = "flit_core.buildapi"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["identified"]
