@@ -1,0 +1,10 @@
+{
+	"dependencies": {
+		"@tailwindcss/cli": "^4.0.0-beta.9",
+		"tailwindcss": "^4.0.0-beta.9"
+	},
+	"scripts": {
+		"css": "npx @tailwindcss/cli -i ./identified/static/style.css -o ./identified/static/output.css",
+		"watch": "npx @tailwindcss/cli -i ./identified/static/style.css -o ./identified/static/output.css --watch"
+	}
+}
