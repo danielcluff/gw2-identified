@@ -530,17 +530,11 @@
   .block {
     display: block;
   }
+  .grid {
+    display: grid;
+  }
   .max-w-screen-md {
     max-width: var(--breakpoint-md);
-  }
-  .max-w-screen-xl {
-    max-width: var(--breakpoint-xl);
-  }
-  .bg-slate-800 {
-    background-color: var(--color-slate-800);
-  }
-  .bg-stone-800 {
-    background-color: var(--color-stone-800);
   }
   .bg-zinc-800 {
     background-color: var(--color-zinc-800);
@@ -548,12 +542,6 @@
   .text-4xl {
     font-size: var(--text-4xl);
     line-height: var(--tw-leading, var(--text-4xl--line-height));
-  }
-  .text-blue-700 {
-    color: var(--color-blue-700);
-  }
-  .text-gray-300 {
-    color: var(--color-gray-300);
   }
   .text-orange-500 {
     color: var(--color-orange-500);
