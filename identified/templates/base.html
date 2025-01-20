@@ -1,21 +1,39 @@
 <!DOCTYPE html>
 <title>{% block title %}{% endblock %} - Flask</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-<nav>
-	<h1>Identified</h1>
-	<ul>
-		{% if g.user %}
-		<li><span>{{ g.user['username'] }}</span></li>
-		<li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-		{% else %}
-		<li><a href="{{ url_for('auth.register') }}">Register</a></li>
-		<li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-		{% endif %}
-	</ul>
-</nav>
-<section class="content">
-	<header>{% block header %}{% endblock %}</header>
-	{% for message in get_flashed_messages() %}
-	<div class="flash">{{ message }}</div>
-	{% endfor %} {% block content %}{% endblock %}
-</section>
+<link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<body class="bg-zinc-900 text-stone-300 flex flex-col h-screen">
+	<header class="w-full border-zinc-800 border-b">
+		<div class="mx-auto container flex justify-between items-center py-4 w-full px-4">
+			<a href="/"><h1 class="text-4xl text-amber-600">GW2 Identified</h1></a>
+			<nav class="h-full">
+				<ul class="flex items-center gap-4 text-stone-300">
+					{% if g.user %}
+					<li>
+						<a class="hover:text-stone-200" href="{{ url_for('user')}}">{{ g.user['username'] }}</a>
+					</li>
+					<li><a class="hover:text-stone-200" href="{{ url_for('auth.logout') }}">Logout</a></li>
+					{% else %}
+					<li>
+						<a class="hover:text-stone-200" href="{{ url_for('auth.register') }}">Register</a>
+					</li>
+					<li><a class="hover:text-stone-200" href="{{ url_for('auth.login') }}">Login</a></li>
+					{% endif %}
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<main class="flex-1 mt-8">
+		<section class="container content mx-auto px-4">
+			{% for message in get_flashed_messages() %}
+			<div class="flash">{{ message }}</div>
+			{% endfor %} {% block content %}{% endblock %}
+		</section>
+	</main>
+	<footer class="">
+		<section class="mx-auto container py-4 px-4">
+			<a href="https://danielcluff.com" target="_blank" class="text-body">© DanielCluff.com</a>
+			<p class="mt-4">Made with 🐍 Flask</p>
+		</section>
+	</footer>
+</body>
