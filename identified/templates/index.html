@@ -1,0 +1,8 @@
+{% extends 'base.html' %} {% block content %} {% block title %}Home{% endblock %} {% if g.user %}
+<a class="action" href="{{ url_for('user.user') }}">New</a>
+{% endif %}
+<article class="post">
+	<header>Okay, let's do this</header>
+	<p class="body">oh yes, we are doing it!</p>
+</article>
+{% endblock %}

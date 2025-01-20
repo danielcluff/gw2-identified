@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<title>{% block title %}{% endblock %} - Flask</title>
+<title>{% block title %}{% endblock %} - GW2 Identified</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <body class="bg-zinc-900 text-stone-300 flex flex-col h-screen">
@@ -10,7 +10,11 @@
 				<ul class="flex items-center gap-4 text-stone-300">
 					{% if g.user %}
 					<li>
-						<a class="hover:text-stone-200" href="{{ url_for('user')}}">{{ g.user['username'] }}</a>
+						<a
+							class="text-amber-600 hover:text-amber-500 duration-150"
+							href="{{ url_for('user.user')}}"
+							>{{ g.user['username'] }}</a
+						>
 					</li>
 					<li><a class="hover:text-stone-200" href="{{ url_for('auth.logout') }}">Logout</a></li>
 					{% else %}

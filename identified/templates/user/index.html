@@ -1,22 +1,38 @@
-{% extends 'base.html' %} {% block header %}
-<h1>{% block title %}Posts{% endblock %}</h1>
-{% if g.user %}
-<a class="action" href="{{ url_for('blog.create') }}">New</a>
-{% endif %} {% endblock %} {% block content %} {% for post in posts %}
-<article class="post">
-	<header>
-		<div>
-			<h1>{{ post['title'] }}</h1>
-			<div class="about">
-				by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}
-			</div>
-		</div>
-		{% if g.user['id'] == post['author_id'] %}
-		<a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-		{% endif %}
-	</header>
-	<p class="body">{{ post['body'] }}</p>
-</article>
-{% if not loop.last %}
-<hr />
-{% endif %} {% endfor %} {% endblock %}
+{% extends 'base.html' %} {% block content %}
+<h1>{% block title %}Welcome {{ g.user.username }}{% endblock %}</h1>
+<form method="post flex flex-col">
+	<section aria-label="rarity">
+		<img
+			id="rarityIcon"
+			src="{{ url_for('static', filename='icons/rarity_green.png') }}"
+			alt="rarity icon"
+			class="rarity-icon"
+		/>
+		<select name="rarity" id="rarity" onchange="updateRarityIcon(this.value)">
+			<option value="blue" label="Common">Common</option>
+			<option value="green" label="Masterwork" selected>Masterwork</option>
+			<option value="rare" label="Rare">Rare</option>
+		</select>
+	</section>
+	<div class="grid grid-cols-4"></div>
+	<div class="mithril"></div>
+	<label for="o_mithril">Mithril</label>
+	<input
+		name="o_mithril"
+		id="o_mithril"
+		value="{{ request.form['o_mithril'] }}"
+		type="number"
+		required
+	/>
+	<label for="body">Body</label>
+	<!-- <textarea name="body" id="body">{{ request.form['body'] }}</textarea> -->
+	<input type="submit" value="Save" />
+</form>
+<script>
+	function updateRarityIcon(rarity) {
+		const iconElement = document.getElementById("rarityIcon");
+		iconElement.src = `{{ url_for('static', filename='icons/') }}rarity_${rarity}.png`;
+		iconElement.alt = `${rarity} rarity icon`;
+	}
+</script>
+{% endblock %}
