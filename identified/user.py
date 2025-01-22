@@ -28,28 +28,27 @@ def user():
     return render_template("user/index.html", posts=posts)
 
 
-@bp.route("/create", methods=("GET", "POST"))
+@bp.route("/create", methods=("POST",))
 @login_required
 def create():
-    if request.method == "POST":
-        title = "title"
-        body = request.form["created"]
-        error = None
+    title = "title"
+    body = request.form["created"]
+    error = None
 
-        if not title:
-            error = "Title is required."
+    if not title:
+        error = "Title is required."
 
-        if error is not None:
-            flash(error)
+    if error is not None:
+        flash(error)
 
-        else:
-            db = get_db()
-            db.execute(
-                "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-                (title, body, g.user["id"]),
-            )
-            db.commit()
-            return redirect(url_for("user.index"))
+    else:
+        db = get_db()
+        db.execute(
+            "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
+            (title, body, g.user["id"]),
+        )
+        db.commit()
+        return redirect(url_for("user.index"))
 
 
 def get_post(id, check_author=True):

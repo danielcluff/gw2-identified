@@ -1,38 +1,826 @@
 {% extends 'base.html' %} {% block content %}
-<h1>{% block title %}Welcome {{ g.user.username }}{% endblock %}</h1>
-<form method="post flex flex-col">
-	<section aria-label="rarity">
-		<img
-			id="rarityIcon"
-			src="{{ url_for('static', filename='icons/rarity_green.png') }}"
-			alt="rarity icon"
-			class="rarity-icon"
-		/>
-		<select name="rarity" id="rarity" onchange="updateRarityIcon(this.value)">
-			<option value="blue" label="Common">Common</option>
-			<option value="green" label="Masterwork" selected>Masterwork</option>
-			<option value="rare" label="Rare">Rare</option>
-		</select>
+<h1 class="text-2xl mb-8">
+	{% block title %}Welcome <span class="text-amber-600 font-bold">{{ g.user.username }}</span>{%
+	endblock %}
+</h1>
+<form method="post" action="{{ url_for('user.create') }}">
+	<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 border-b border-zinc-800">
+		<section aria-label="rarity" class="flex pb-4">
+			<img
+				id="rarityIcon"
+				src="{{ url_for('static', filename='icons/rarity_green.png') }}"
+				alt="rarity icon"
+				class="rarity-icon size-12 mr-2"
+			/>
+			<div>
+				<label class="block mb-1" for="rarity">Type</label>
+				<select name="rarity" id="rarity" onchange="updateRarityIcon(this.value)">
+					<option value="blue" label="Common">Common</option>
+					<option value="green" label="Masterwork" selected>Masterwork</option>
+					<option value="rare" label="Rare">Rare</option>
+				</select>
+			</div>
+		</section>
+		<section
+			aria-label="rarity amount"
+			class="flex flex-col items-end sm:items-start justify-between col-span-1 pb-4"
+		>
+			<label class="" for="amount">Amount</label>
+			<input
+				class="text-right px-2 w-20 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+				name="amount"
+				id="amount"
+				value="0"
+				type="number"
+			/>
+		</section>
+	</div>
+	<div
+		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4 mb-4 border-b border-zinc-800"
+	>
+		<section class="flex mithril col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}o_mithril.png"
+					alt="Mithril Ore"
+					onclick="incrementStack('mithril')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="o_mithril">Mithril</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="o_mithril"
+						id="o_mithril"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_mithril">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_mithril"
+						type="number"
+						value="0"
+						name="stack_mithril"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex oric col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}o_oric.png"
+					alt="Orichalcum Ore"
+					onclick="incrementStack('oric')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="o_oric">Orichalcum</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="o_oric"
+						id="o_oric"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_oric">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_oric"
+						type="number"
+						value="0"
+						name="stack_oric"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex elder col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}w_elder.png"
+					alt="Elder Wood"
+					onclick="incrementStack('elder')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="w_elder">Elder</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="w_elder"
+						id="w_elder"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_elder">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_elder"
+						type="number"
+						value="0"
+						name="stack_elder"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex ancient col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}w_ancient.png"
+					alt="Ancient Wood"
+					onclick="incrementStack('ancient')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="w_ancient">Ancient</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="w_ancient"
+						id="w_ancient"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_ancient">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_ancient"
+						type="number"
+						value="0"
+						name="stack_ancient"
+					/>
+				</section>
+			</div>
+		</section>
+
+		<section class="flex silk col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}c_silk.png"
+					alt="Silk Scrap"
+					onclick="incrementStack('silk')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="c_silk">Silk</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="c_silk"
+						id="c_silk"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_silk">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_silk"
+						type="number"
+						value="0"
+						name="stack_silk"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex gossamer col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}c_gossamer.png"
+					alt="Gossamer Scrap"
+					onclick="incrementStack('gossamer')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="c_gossamer">Gossamer</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="c_gossamer"
+						id="c_gossamer"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_gossamer">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_gossamer"
+						type="number"
+						value="0"
+						name="stack_gossamer"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex thick col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}l_thick.png"
+					alt="Thick Leather"
+					onclick="incrementStack('thick')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="l_thick">Thick</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="l_thick"
+						id="l_thick"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_thick">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_thick"
+						type="number"
+						value="0"
+						name="stack_thick"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex hardened col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}l_hardened.png"
+					alt="Hardened Leather"
+					onclick="incrementStack('hardened')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="l_hardened">Hardened</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="l_hardened"
+						id="l_hardened"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_hardened">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_hardened"
+						type="number"
+						value="0"
+						name="stack_hardened"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex lucentmote col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}lucentmote.png"
+					alt="Lucent Mote"
+					onclick="incrementStack('lucentmote')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="" for="lucentmote">Lucent Mote</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="lucentmote"
+						id="lucentmote"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_lucentmote">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_lucentmote"
+						type="number"
+						value="0"
+						name="stack_lucentmote"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex reclaimedmetal col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}reclaimedmetal.png"
+					alt="Reclaimed Metal"
+					onclick="incrementStack('reclaimedmetal')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="reclaimedmetal">Reclaimed Metal</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="reclaimedmetal"
+						id="reclaimedmetal"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_reclaimedmetal">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_reclaimedmetal"
+						type="number"
+						value="0"
+						name="stack_reclaimedmetal"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex control col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}s_control.png"
+					alt="Sigil of Control"
+					onclick="incrementStack('control')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="control">Control Sigil</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="s_control"
+						id="s_control"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_control">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_control"
+						type="number"
+						value="0"
+						name="stack_control"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex enhancement col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}s_enhancement.png"
+					alt="Sigil of Enhancement"
+					onclick="incrementStack('enhancement')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="enhancement">Enhancement Sigil</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="s_enhancement"
+						id="s_enhancement"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_enhancement">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_enhancement"
+						type="number"
+						value="0"
+						name="stack_enhancement"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex pain col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}s_pain.png"
+					alt="Sigil of Pain"
+					onclick="incrementStack('pain')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="pain">Pain Sigil</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="s_pain"
+						id="s_pain"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_pain">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_pain"
+						type="number"
+						value="0"
+						name="stack_pain"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex brilliance col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}c_brilliance.png"
+					alt="Charm of Brilliance"
+					onclick="incrementStack('brilliance')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="brilliance">Brilliance Charm</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="c_brilliance"
+						id="c_brilliance"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_brilliance">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_brilliance"
+						type="number"
+						value="0"
+						name="stack_brilliance"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex potence col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}c_potence.png"
+					alt="Charm of Potence"
+					onclick="incrementStack('potence')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="potence">Potence Charm</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="c_potence"
+						id="c_potence"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_potence">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_potence"
+						type="number"
+						value="0"
+						name="stack_potence"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex skill col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}c_skill.png"
+					alt="Charm of Skill"
+					onclick="incrementStack('skill')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="skill">Skill Charm</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="c_skill"
+						id="c_skill"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_skill">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_skill"
+						type="number"
+						value="0"
+						name="stack_skill"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex luck10 col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}luck10.png"
+					alt="Fine Essence of Luck"
+					onclick="incrementStack('luck10')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="luck10">10 Luck</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="luck10"
+						id="luck10"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_luck10">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_luck10"
+						type="number"
+						value="0"
+						name="stack_luck10"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex luck50 col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}luck50.png"
+					alt="Masterwork Essence of Luck"
+					onclick="incrementStack('luck50')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="luck50">50 Luck</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="luck50"
+						id="luck50"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_luck50">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_luck50"
+						type="number"
+						value="0"
+						name="stack_luck50"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex luck100 col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}luck100.png"
+					alt="Rare Essence of Luck"
+					onclick="incrementStack('luck100')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="luck100">100 Luck</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="luck100"
+						id="luck100"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_luck100">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_luck100"
+						type="number"
+						value="0"
+						name="stack_luck100"
+					/>
+				</section>
+			</div>
+		</section>
+		<section class="flex luck200 col-span-1">
+			<div class="relative flex-none mr-2">
+				<img
+					class="size-12 shadow cursor-pointer"
+					src="{{ url_for('static', filename='icons/') }}luck200.png"
+					alt="Exotic Essence of Luck"
+					onclick="incrementStack('luck200')"
+				/>
+				<p class="absolute -top-1 right-1 font-bold text-white pointer-events-none">+</p>
+			</div>
+			<div class="flex flex-col w-full">
+				<section class="flex justify-between items-center gap-4">
+					<label class="truncate" for="luck200">200 Luck</label>
+					<input
+						class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						name="luck200"
+						id="luck200"
+						value="0"
+						type="number"
+						max="250"
+					/>
+				</section>
+				<section class="flex justify-between items-center gap-4">
+					<label for="stack_luck200">Stacks</label>
+					<input
+						class="text-right px-2 w-12 border border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+						id="stack_luck200"
+						type="number"
+						value="0"
+						name="stack_luck200"
+					/>
+				</section>
+			</div>
+		</section>
+	</div>
+	<section
+		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4 mb-4 border-b border-zinc-800"
+	>
+		<section class="flex flex-col rares col-span-1 gap-1">
+			<p class="text-yellow-400">Rares</p>
+			<section class="flex justify-between">
+				<label for="r_amount">Amount</label>
+				<input
+					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_amount"
+					id="r_amount"
+					value="0"
+					type="number"
+				/>
+			</section>
+			<section class="flex justify-between">
+				<label for="r_salvaged">Salvaged</label>
+				<input
+					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_salvaged"
+					id="r_salvaged"
+					value="0"
+					type="number"
+				/>
+			</section>
+			<section class="flex justify-between items-center">
+				<div class="flex items-center">
+					<img
+						class="size-6 mr-2 shadow cursor-pointer"
+						src="{{ url_for('static', filename='icons/') }}ecto.png"
+						alt="Glob of Ectoplasm"
+					/>
+					<label for="r_ecto">Ecto</label>
+				</div>
+				<input
+					class="justify-self-end text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_ecto"
+					id="r_ecto"
+					value="0"
+					type="number"
+				/>
+			</section>
+		</section>
+		<section class="flex flex-col rares col-span-1 gap-1">
+			<p class="text-orange-500">Exotics</p>
+			<section class="flex justify-between">
+				<label for="r_amount">Amount</label>
+				<input
+					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_amount"
+					id="r_amount"
+					value="0"
+					type="number"
+				/>
+			</section>
+			<section class="flex justify-between">
+				<label for="r_salvaged">Salvaged</label>
+				<input
+					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_salvaged"
+					id="r_salvaged"
+					value="0"
+					type="number"
+				/>
+			</section>
+			<section class="flex justify-between items-center">
+				<div class="flex items-center">
+					<img
+						class="size-6 mr-2 shadow cursor-pointer"
+						src="{{ url_for('static', filename='icons/') }}ecto.png"
+						alt="Glob of Ectoplasm"
+					/>
+					<label for="r_ecto">Ecto</label>
+				</div>
+				<input
+					class="justify-self-end text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					name="r_ecto"
+					id="r_ecto"
+					value="0"
+					type="number"
+				/>
+			</section>
+		</section>
 	</section>
-	<div class="grid grid-cols-4"></div>
-	<div class="mithril"></div>
-	<label for="o_mithril">Mithril</label>
 	<input
-		name="o_mithril"
-		id="o_mithril"
-		value="{{ request.form['o_mithril'] }}"
-		type="number"
-		required
+		class="mt-4 mb-40 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg cursor-pointer"
+		type="submit"
+		value="Submit"
 	/>
-	<label for="body">Body</label>
-	<!-- <textarea name="body" id="body">{{ request.form['body'] }}</textarea> -->
-	<input type="submit" value="Save" />
 </form>
 <script>
 	function updateRarityIcon(rarity) {
 		const iconElement = document.getElementById("rarityIcon");
 		iconElement.src = `{{ url_for('static', filename='icons/') }}rarity_${rarity}.png`;
 		iconElement.alt = `${rarity} rarity icon`;
+	}
+	function incrementStack(type) {
+		let inputType = "stack_" + type;
+		const input = document.getElementById(inputType);
+		let currentValue = parseInt(input.value) || 0;
+		input.value = currentValue + 1;
 	}
 </script>
 {% endblock %}
