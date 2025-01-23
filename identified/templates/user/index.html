@@ -805,12 +805,14 @@
 		</section>
 	</section>
 	<input
-		class="mt-4 mb-40 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg cursor-pointer"
+		class="mt-4 mb-20 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg cursor-pointer"
 		type="submit"
 		value="Submit"
 	/>
 </form>
-<section class="w-full">
+<section class="w-full mb-20">
+	<p class="text-center">Average percentage outcome for Unidentified salvage</p>
+	<p class="text-center text-sm text-zinc-400">(Your data)</p>
 	<canvas id="user"></canvas>
 </section>
 <script>
@@ -825,5 +827,73 @@
 		let currentValue = parseInt(input.value) || 0;
 		input.value = currentValue + 1;
 	}
+</script>
+<script type="text/javascript">
+	let userctx = document.getElementById("user")?.getContext("2d");
+
+	const rawdata = {
+		userblue: {{ posts["blue"]|safe }},
+		usergreen: {{ posts["green"]|safe }},
+		userrare: {{ posts["rare"]|safe }},
+	};
+	const processed = {
+		userblue: [],
+		usergreen: [],
+		userrare: [],
+	};
+	const rows = ["userblue", "usergreen", "userrare"]
+
+	for (const row of rows) {
+		if (rawdata[row] === null) continue
+		const amount = rawdata[row].amount
+		for (const mat of [...{{materials|safe}}, "rare", "exotic"]) {
+			percentage = (rawdata[row][mat] / amount) * 100
+			processed[row].push(percentage);
+		}
+	}
+
+	let userchart = new Chart(userctx, {
+		type: "bar",
+		data: {
+			labels: [
+				"Mithril", "Orichalcum", "Elder Wood", "Ancient Wood", "Silk",
+				"Gossamer", "Thick Leather", "Hardened Leather", "Lucent Mote",
+				"Reclaimed Metal", "Pain Sigil", "Enhancement Sigil", "Control Sigil",
+				"Skill Charm", "Potence Charm", "Brilliance Charm",
+				"Luck 10", "Luck 50", "Luck 100", "Luck 200", "Rare", "Exotic"
+			],
+			datasets: [
+				{
+					label: "Common",
+					data: processed.userblue,
+					minBarLength: 3,
+					backgroundColor: "#62A4DA"
+				},
+
+				{
+					label: "Masterwork",
+					data: processed.usergreen,
+					minBarLength: 3,
+					backgroundColor: "#1a9306"
+				},
+				{
+					label: "Rare",
+					data: processed.userrare,
+					minBarLength: 3,
+					backgroundColor: "#fcd00b"
+				},
+			],
+		},
+		options: {
+			plugins: {
+				legend: {
+					display: true
+				},
+				tooltip: {
+					afterBody: "%"
+				}
+			}
+		}
+	});
 </script>
 {% endblock %}
