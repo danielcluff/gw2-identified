@@ -28,7 +28,7 @@
 			</nav>
 		</div>
 	</header>
-	<main class="flex-1 mt-8">
+	<main class="flex-1 mt-8 mb-20">
 		<section class="container content mx-auto px-4">
 			{% for message in get_flashed_messages() %}
 			<div class="flash">{{ message }}</div>
@@ -36,9 +36,9 @@
 		</section>
 	</main>
 	<footer class="">
-		<section class="mx-auto container py-4 px-4">
+		<section class="mx-auto container py-16 px-4">
 			<a href="https://danielcluff.com" target="_blank" class="text-body">© DanielCluff.com</a>
-			<p class="mt-4">Made with 🐍 Flask</p>
+			<p class="mt-8">Made with 🐍 Flask</p>
 		</section>
 	</footer>
 </body>
