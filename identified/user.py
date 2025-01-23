@@ -2,6 +2,7 @@ from flask import Blueprint, flash, g, redirect, render_template, request, url_f
 from werkzeug.exceptions import abort
 from .auth import login_required
 from .db import get_db
+from .constants import stackable, unstacked, materials, sum_expressions
 
 bp = Blueprint("user", __name__)
 
@@ -9,34 +10,74 @@ bp = Blueprint("user", __name__)
 @bp.route("/")
 def index():
     db = get_db()
-    posts = db.execute(
-        "SELECT p.id, author_id, created, w_elder, w_ancient, o_mithril, o_oric, c_silk, c_gossamer, l_rough, l_hardened, lucentmotes, reclaimedmetal, s_pain, s_enhance, s_control, c_skill, c_potency, c_brilliance, luck10, luck50, luck100, luck200, rare, exotic"
-        " FROM post p JOIN user u ON p.author_id = u.id"
-        " ORDER BY created DESC"
-    ).fetchall()
-    return render_template("index.html", posts=posts)
+
+    query_all = f"""
+        SELECT {sum_expressions}
+        FROM post
+    """
+
+    allposts = db.execute(query_all).fetchone()
+
+    posts = None
+    if g.user:
+        query = f"""
+            SELECT {sum_expressions}
+            FROM post
+            WHERE author_id = ?
+        """
+        posts = db.execute(query, (g.user["id"],)).fetchone()
+
+    return render_template(
+        "index.html", posts=posts, allposts=allposts, materials=stackable
+    )
 
 
 @bp.route("/user")
+@login_required
 def user():
     db = get_db()
-    posts = db.execute(
-        "SELECT p.id, author_id, created, w_elder, w_ancient, o_mithril, o_oric, c_silk, c_gossamer, l_rough, l_hardened, lucentmotes, reclaimedmetal, s_pain, s_enhance, s_control, c_skill, c_potency, c_brilliance, luck10, luck50, luck100, luck200, rare, exotic"
-        " FROM post p JOIN user u ON p.author_id = u.id"
-        " ORDER BY created DESC"
-    ).fetchall()
-    return render_template("user/index.html", posts=posts)
+
+    query = f"""
+        SELECT {sum_expressions}
+        FROM post
+        WHERE author_id = ?
+    """
+
+    posts = db.execute(query, (g.user["id"],)).fetchone()
+    print("User totals:", dict(posts))
+    return render_template("user/index.html", posts=posts, materials=stackable)
 
 
 @bp.route("/create", methods=("POST",))
 @login_required
 def create():
-    title = "title"
-    body = request.form["created"]
-    error = None
+    def get_int_value(key):
+        return int(request.form.get(key, 0) or 0)
 
-    if not title:
-        error = "Title is required."
+    rarity = request.form["rarity"] or "green"
+    values = {}
+
+    for material in unstacked:
+        values[material] = get_int_value(material)
+
+    for material in stackable:
+        values[material] = get_int_value(material)
+        values[f"stack_{material}"] = get_int_value(f"stack_{material}")
+
+    for material in stackable:
+        stack_value = values[f"stack_{material}"]
+        if stack_value > 0:
+            values[material] += stack_value * 250
+
+    if values["r_salvaged"] > values["rare"]:
+        values["r_salvaged"] = 0
+        values["r_ecto"] = 0
+
+    if values["e_salvaged"] > values["exotic"]:
+        values["e_salvaged"] = 0
+        values["e_ecto"] = 0
+
+    error = None
 
     if error is not None:
         flash(error)
@@ -44,11 +85,12 @@ def create():
     else:
         db = get_db()
         db.execute(
-            "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-            (title, body, g.user["id"]),
+            "INSERT INTO post (author_id, rarity, " + ", ".join(materials) + ") "
+            "VALUES (?, ?, " + ", ".join("?" * len(materials)) + ")",
+            (g.user["id"], rarity) + tuple(values[material] for material in materials),
         )
         db.commit()
-        return redirect(url_for("user.index"))
+        return redirect(url_for("user.user"))
 
 
 def get_post(id, check_author=True):
