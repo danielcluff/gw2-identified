@@ -34,5 +34,5 @@ materials = stackable + unstacked
 
 
 sum_expressions = ", ".join(
-    [f"SUM({material}) as {material}" for material in materials]
+    [f"COALESCE(SUM({material}), 0) as {material}" for material in materials]
 )

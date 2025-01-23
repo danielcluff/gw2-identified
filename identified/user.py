@@ -12,20 +12,44 @@ def index():
     db = get_db()
 
     query_all = f"""
-        SELECT {sum_expressions}
+        SELECT rarity, {sum_expressions}
         FROM post
+        WHERE rarity IN ("blue", "green", "rare")
+        GROUP BY rarity
+        ORDER BY CASE rarity
+            WHEN "blue" THEN 1
+            WHEN "green" THEN 2
+            WHEN "rare" THEN 3
+        End
     """
+    allresults = db.execute(query_all).fetchall()
+    allposts = {"blue": "null", "green": "null", "rare": "null"}
 
-    allposts = db.execute(query_all).fetchone()
+    for row in allresults:
+        rarity = row["rarity"]
+        # Only add data if any material has a value > 0
+        if any(row[material] > 0 for material in materials):
+            allposts[rarity] = dict(row)
 
-    posts = None
-    if g.user:
-        query = f"""
-            SELECT {sum_expressions}
-            FROM post
-            WHERE author_id = ?
-        """
-        posts = db.execute(query, (g.user["id"],)).fetchone()
+    query = f"""
+        SELECT rarity, {sum_expressions}
+        FROM post
+        WHERE rarity IN ("blue", "green", "rare")
+        GROUP BY rarity
+        ORDER BY CASE rarity
+            WHEN "blue" THEN 1
+            WHEN "green" THEN 2
+            WHEN "rare" THEN 3
+        End
+    """
+    results = db.execute(query).fetchall()
+    posts = {"blue": "null", "green": "null", "rare": "null"}
+
+    for row in results:
+        rarity = row["rarity"]
+        # Only add data if any material has a value > 0
+        if any(row[material] > 0 for material in materials):
+            posts[rarity] = dict(row)
 
     return render_template(
         "index.html", posts=posts, allposts=allposts, materials=stackable
@@ -38,13 +62,25 @@ def user():
     db = get_db()
 
     query = f"""
-        SELECT {sum_expressions}
+        SELECT rarity, {sum_expressions}
         FROM post
-        WHERE author_id = ?
+        WHERE rarity IN ("blue", "green", "rare")
+        GROUP BY rarity
+        ORDER BY CASE rarity
+            WHEN "blue" THEN 1
+            WHEN "green" THEN 2
+            WHEN "rare" THEN 3
+        End
     """
+    results = db.execute(query).fetchall()
+    posts = {"blue": "null", "green": "null", "rare": "null"}
 
-    posts = db.execute(query, (g.user["id"],)).fetchone()
-    print("User totals:", dict(posts))
+    for row in results:
+        rarity = row["rarity"]
+        # Only add data if any material has a value > 0
+        if any(row[material] > 0 for material in materials):
+            posts[rarity] = dict(row)
+
     return render_template("user/index.html", posts=posts, materials=stackable)
 
 

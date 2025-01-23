@@ -1,8 +1,142 @@
-{% extends 'base.html' %} {% block content %} {% block title %}Home{% endblock %} {% if g.user %}
-<a class="action" href="{{ url_for('user.user') }}">New</a>
-{% endif %}
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content %}
+
 <article class="post">
-	<header>Okay, let's do this</header>
-	<p class="body">oh yes, we are doing it!</p>
+	<header class="flex justify-between items-baseline mb-8">
+		<h1 class="text-2xl">Inventory processing tracker</h1>
+		{% if g.user %}
+		<a class="text-amber-600 underline" href="{{ url_for('user.user') }}">Add data</a>
+		{% endif %}
+	</header>
+	{% if g.user %}
+	<section class="w-full mb-20">
+		<p class="text-center">Average percentage outcome for Unidentified salvage</p>
+		<p class="text-center text-sm text-zinc-400">(Your data)</p>
+		<canvas id="user"></canvas>
+	</section>
+	{% endif %}
+	<section class="w-full mb-20">
+		<p class="text-center">Average percentage outcome for Unidentified salvage</p>
+		<p class="text-center text-sm text-zinc-400">(All users)</p>
+		<canvas id="allusers"></canvas>
+	</section>
 </article>
+<script type="text/javascript">
+	let userctx = document.getElementById("user")?.getContext("2d");
+	let allctx = document.getElementById("allusers").getContext("2d");
+
+	const rawdata = {
+		allblue: {{ allposts["blue"]|safe }},
+		allgreen: {{ allposts["green"]|safe }},
+		allrare: {{ allposts["rare"]|safe }},
+		userblue: {{ posts["blue"]|safe }},
+		usergreen: {{ posts["green"]|safe }},
+		userrare: {{ posts["rare"]|safe }},
+	};
+	const processed = {
+		allblue: [],
+		allgreen: [],
+		allrare: [],
+		userblue: [],
+		usergreen: [],
+		userrare: [],
+	};
+	const rows = ["allblue", "allgreen", "allrare", "userblue", "usergreen", "userrare"]
+
+	for (const row of rows) {
+		if (rawdata[row] === null) continue
+		const amount = rawdata[row].amount
+		for (const mat of [...{{materials|safe}}, "rare", "exotic"]) {
+			percentage = (rawdata[row][mat] / amount) * 100
+			processed[row].push(percentage);
+		}
+	}
+
+	let userchart;
+	if (userctx) userchart = new Chart(userctx, {
+		type: "bar",
+		data: {
+			labels: [
+				"Mithril", "Orichalcum", "Elder Wood", "Ancient Wood", "Silk",
+				"Gossamer", "Thick Leather", "Hardened Leather", "Lucent Mote",
+				"Reclaimed Metal", "Pain Sigil", "Enhancement Sigil", "Control Sigil",
+				"Skill Charm", "Potence Charm", "Brilliance Charm",
+				"Luck 10", "Luck 50", "Luck 100", "Luck 200", "Rare", "Exotic"
+			],
+			datasets: [
+				{
+					label: "Common",
+					data: processed.userblue,
+					minBarLength: 3,
+					backgroundColor: "#62A4DA"
+				},
+
+				{
+					label: "Masterwork",
+					data: processed.usergreen,
+					minBarLength: 3,
+					backgroundColor: "#1a9306"
+				},
+				{
+					label: "Rare",
+					data: processed.userrare,
+					minBarLength: 3,
+					backgroundColor: "#fcd00b"
+				},
+			],
+		},
+		options: {
+			plugins: {
+				legend: {
+					display: true
+				},
+				tooltip: {
+					afterBody: "%"
+				}
+			}
+		}
+	});
+	let allchart = new Chart(allctx, {
+		type: "bar",
+		data: {
+			labels: [
+				"Mithril", "Orichalcum", "Elder Wood", "Ancient Wood", "Silk",
+				"Gossamer", "Thick Leather", "Hardened Leather", "Lucent Mote",
+				"Reclaimed Metal", "Pain Sigil", "Enhancement Sigil", "Control Sigil",
+				"Skill Charm", "Potence Charm", "Brilliance Charm",
+				"Luck 10", "Luck 50", "Luck 100", "Luck 200", "Rare", "Exotic"
+			],
+			datasets: [
+				{
+					label: "Common",
+					data: processed.allblue,
+					minBarLength: 3,
+					backgroundColor: "#62A4DA"
+				},
+
+				{
+					label: "Masterwork",
+					data: processed.allgreen,
+					minBarLength: 3,
+					backgroundColor: "#1a9306"
+				},
+				{
+					label: "Rare",
+					data: processed.allrare,
+					minBarLength: 3,
+					backgroundColor: "#fcd00b"
+				},
+			],
+		},
+		options: {
+			plugins: {
+				legend: {
+					display: true
+				},
+				tooltip: {
+					afterBody: "%"
+				}
+			}
+		}
+	});
+</script>
 {% endblock %}
