@@ -63,7 +63,12 @@ def register():
             except db.IntegrityError:
                 error = f"User {username} is already taken."
             else:
-                return redirect(url_for("auth.login"))
+                user = db.execute(
+                    "SELECT * FROM user WHERE username = ?", (username,)
+                ).fetchone()
+                session.clear()
+                session["user_id"] = user["id"]
+                return redirect(url_for("user.user"))
 
         flash(error)
 
