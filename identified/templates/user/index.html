@@ -726,11 +726,11 @@
 		<section class="flex flex-col rares col-span-1 gap-1">
 			<p class="text-yellow-400">Rares</p>
 			<section class="flex justify-between">
-				<label for="r_amount">Amount</label>
+				<label for="rare">Amount</label>
 				<input
 					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-					name="r_amount"
-					id="r_amount"
+					name="rare"
+					id="rare"
 					value="0"
 					type="number"
 				/>
@@ -766,21 +766,21 @@
 		<section class="flex flex-col rares col-span-1 gap-1">
 			<p class="text-orange-500">Exotics</p>
 			<section class="flex justify-between">
-				<label for="r_amount">Amount</label>
+				<label for="exotic">Amount</label>
 				<input
 					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-					name="r_amount"
-					id="r_amount"
+					name="exotic"
+					id="exotic"
 					value="0"
 					type="number"
 				/>
 			</section>
 			<section class="flex justify-between">
-				<label for="r_salvaged">Salvaged</label>
+				<label for="e_salvaged">Salvaged</label>
 				<input
 					class="text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-					name="r_salvaged"
-					id="r_salvaged"
+					name="e_salvaged"
+					id="e_salvaged"
 					value="0"
 					type="number"
 				/>
@@ -792,12 +792,12 @@
 						src="{{ url_for('static', filename='icons/') }}ecto.png"
 						alt="Glob of Ectoplasm"
 					/>
-					<label for="r_ecto">Ecto</label>
+					<label for="e_ecto">Ecto</label>
 				</div>
 				<input
 					class="justify-self-end text-right px-2 w-12 bg-zinc-800 border border-zinc-700 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-					name="r_ecto"
-					id="r_ecto"
+					name="e_ecto"
+					id="e_ecto"
 					value="0"
 					type="number"
 				/>
@@ -810,10 +810,22 @@
 		value="Submit"
 	/>
 </form>
-<section class="w-full mb-20">
+<section class="w-full mb-20 lg:px-20">
 	<p class="text-center">Average percentage outcome for Unidentified salvage</p>
 	<p class="text-center text-sm text-zinc-400">(Your data)</p>
 	<canvas id="user"></canvas>
+	<section class="mt-4">
+		<div class="flex items-center">
+			<img
+				src="{{ url_for('static', filename='icons/ecto.png') }}"
+				alt="Glob of Ectoplasm"
+				class="ecto-icon size-4 mr-2"
+			/>
+			<h2 class="text-sm text-zinc-400">Ecto salvage rates</h2>
+		</div>
+		<p><span class="text-yellow-400">Rares</span>: {{ ecto["r_ecto_rate"] }}%</p>
+		<p><span class="text-orange-500">Exotics</span>: {{ ecto["e_ecto_rate"] }}%</p>
+	</section>
 </section>
 <script>
 	function updateRarityIcon(rarity) {

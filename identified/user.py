@@ -14,7 +14,6 @@ def index():
     query_all = f"""
         SELECT rarity, {sum_expressions}
         FROM post
-        WHERE rarity IN ("blue", "green", "rare")
         GROUP BY rarity
         ORDER BY CASE rarity
             WHEN "blue" THEN 1
@@ -31,28 +30,81 @@ def index():
         if any(row[material] > 0 for material in materials):
             allposts[rarity] = dict(row)
 
-    query = f"""
-        SELECT rarity, {sum_expressions}
-        FROM post
-        WHERE rarity IN ("blue", "green", "rare")
-        GROUP BY rarity
-        ORDER BY CASE rarity
-            WHEN "blue" THEN 1
-            WHEN "green" THEN 2
-            WHEN "rare" THEN 3
-        End
-    """
-    results = db.execute(query).fetchall()
     posts = {"blue": "null", "green": "null", "rare": "null"}
+    if g.user:
+        query = f"""
+            SELECT rarity, {sum_expressions}
+            FROM post
+            WHERE author_id = ?
+            GROUP BY rarity
+            ORDER BY CASE rarity
+                WHEN "blue" THEN 1
+                WHEN "green" THEN 2
+                WHEN "rare" THEN 3
+            End
+        """
+        results = db.execute(query, (g.user["id"],)).fetchall()
 
-    for row in results:
-        rarity = row["rarity"]
-        # Only add data if any material has a value > 0
-        if any(row[material] > 0 for material in materials):
-            posts[rarity] = dict(row)
+        for row in results:
+            rarity = row["rarity"]
+            # Only add data if any material has a value > 0
+            if any(row[material] > 0 for material in materials):
+                posts[rarity] = dict(row)
+
+    query_ecto = """
+        SELECT 
+            -- Regular salvage stats
+            COALESCE(SUM(r_salvaged), 0) as total_r_salvaged,
+            COALESCE(SUM(r_ecto), 0) as total_r_ecto,
+            CASE 
+                WHEN COALESCE(SUM(r_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(r_ecto) AS FLOAT) / SUM(r_salvaged) * 100, 2)
+                ELSE 0 
+            END as r_ecto_rate,
+            
+            -- Exotic salvage stats
+            COALESCE(SUM(e_salvaged), 0) as total_e_salvaged,
+            COALESCE(SUM(e_ecto), 0) as total_e_ecto,
+            CASE 
+                WHEN COALESCE(SUM(e_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(e_ecto) AS FLOAT) / SUM(e_salvaged) * 100, 2)
+                ELSE 0 
+            END as e_ecto_rate
+        FROM post
+        WHERE author_id = ?
+    """
+    ecto = db.execute(query_ecto, (g.user["id"],)).fetchone()
+
+    query_ectoall = """
+        SELECT 
+            -- Regular salvage stats
+            COALESCE(SUM(r_salvaged), 0) as total_r_salvaged,
+            COALESCE(SUM(r_ecto), 0) as total_r_ecto,
+            CASE 
+                WHEN COALESCE(SUM(r_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(r_ecto) AS FLOAT) / SUM(r_salvaged) * 100, 2)
+                ELSE 0 
+            END as r_ecto_rate,
+            
+            -- Exotic salvage stats
+            COALESCE(SUM(e_salvaged), 0) as total_e_salvaged,
+            COALESCE(SUM(e_ecto), 0) as total_e_ecto,
+            CASE 
+                WHEN COALESCE(SUM(e_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(e_ecto) AS FLOAT) / SUM(e_salvaged) * 100, 2)
+                ELSE 0 
+            END as e_ecto_rate
+        FROM post
+    """
+    ectoall = db.execute(query_ectoall).fetchone()
 
     return render_template(
-        "index.html", posts=posts, allposts=allposts, materials=stackable
+        "index.html",
+        posts=posts,
+        allposts=allposts,
+        materials=stackable,
+        ecto=ecto,
+        ectoall=ectoall,
     )
 
 
@@ -64,7 +116,7 @@ def user():
     query = f"""
         SELECT rarity, {sum_expressions}
         FROM post
-        WHERE rarity IN ("blue", "green", "rare")
+        WHERE author_id = ?
         GROUP BY rarity
         ORDER BY CASE rarity
             WHEN "blue" THEN 1
@@ -72,7 +124,7 @@ def user():
             WHEN "rare" THEN 3
         End
     """
-    results = db.execute(query).fetchall()
+    results = db.execute(query, (g.user["id"],)).fetchall()
     posts = {"blue": "null", "green": "null", "rare": "null"}
 
     for row in results:
@@ -81,7 +133,33 @@ def user():
         if any(row[material] > 0 for material in materials):
             posts[rarity] = dict(row)
 
-    return render_template("user/index.html", posts=posts, materials=stackable)
+    query_ecto = """
+        SELECT 
+            -- Regular salvage stats
+            COALESCE(SUM(r_salvaged), 0) as total_r_salvaged,
+            COALESCE(SUM(r_ecto), 0) as total_r_ecto,
+            CASE 
+                WHEN COALESCE(SUM(r_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(r_ecto) AS FLOAT) / SUM(r_salvaged) * 100, 2)
+                ELSE 0 
+            END as r_ecto_rate,
+            
+            -- Exotic salvage stats
+            COALESCE(SUM(e_salvaged), 0) as total_e_salvaged,
+            COALESCE(SUM(e_ecto), 0) as total_e_ecto,
+            CASE 
+                WHEN COALESCE(SUM(e_salvaged), 0) > 0 
+                THEN ROUND(CAST(SUM(e_ecto) AS FLOAT) / SUM(e_salvaged) * 100, 2)
+                ELSE 0 
+            END as e_ecto_rate
+        FROM post
+        WHERE author_id = ?
+    """
+    ecto = db.execute(query_ecto, (g.user["id"],)).fetchone()
+
+    return render_template(
+        "user/index.html", posts=posts, materials=stackable, ecto=ecto
+    )
 
 
 @bp.route("/create", methods=("POST",))
