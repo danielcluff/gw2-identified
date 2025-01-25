@@ -51,29 +51,31 @@ def index():
             if any(row[material] > 0 for material in materials):
                 posts[rarity] = dict(row)
 
-    query_ecto = """
-        SELECT 
-            -- Regular salvage stats
-            COALESCE(SUM(r_salvaged), 0) as total_r_salvaged,
-            COALESCE(SUM(r_ecto), 0) as total_r_ecto,
-            CASE 
-                WHEN COALESCE(SUM(r_salvaged), 0) > 0 
-                THEN ROUND(CAST(SUM(r_ecto) AS FLOAT) / SUM(r_salvaged) * 100, 2)
-                ELSE 0 
-            END as r_ecto_rate,
-            
-            -- Exotic salvage stats
-            COALESCE(SUM(e_salvaged), 0) as total_e_salvaged,
-            COALESCE(SUM(e_ecto), 0) as total_e_ecto,
-            CASE 
-                WHEN COALESCE(SUM(e_salvaged), 0) > 0 
-                THEN ROUND(CAST(SUM(e_ecto) AS FLOAT) / SUM(e_salvaged) * 100, 2)
-                ELSE 0 
-            END as e_ecto_rate
-        FROM post
-        WHERE author_id = ?
-    """
-    ecto = db.execute(query_ecto, (g.user["id"],)).fetchone()
+    ecto = None
+    if g.user:
+        query_ecto = """
+            SELECT 
+                -- Regular salvage stats
+                COALESCE(SUM(r_salvaged), 0) as total_r_salvaged,
+                COALESCE(SUM(r_ecto), 0) as total_r_ecto,
+                CASE 
+                    WHEN COALESCE(SUM(r_salvaged), 0) > 0 
+                    THEN ROUND(CAST(SUM(r_ecto) AS FLOAT) / SUM(r_salvaged) * 100, 2)
+                    ELSE 0 
+                END as r_ecto_rate,
+                
+                -- Exotic salvage stats
+                COALESCE(SUM(e_salvaged), 0) as total_e_salvaged,
+                COALESCE(SUM(e_ecto), 0) as total_e_ecto,
+                CASE 
+                    WHEN COALESCE(SUM(e_salvaged), 0) > 0 
+                    THEN ROUND(CAST(SUM(e_ecto) AS FLOAT) / SUM(e_salvaged) * 100, 2)
+                    ELSE 0 
+                END as e_ecto_rate
+            FROM post
+            WHERE author_id = ?
+        """
+        ecto = db.execute(query_ecto, (g.user["id"],)).fetchone()
 
     query_ectoall = """
         SELECT 
