@@ -8,7 +8,7 @@ dependencies = [
 
 [build-system]
 requires = ["flit_core<4"]
-build-backent = "flit_core.buildapi"
+build-backend = "flit_core.buildapi"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
