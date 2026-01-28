@@ -1,0 +1,12 @@
+.venv/
+.git/
+node_modules/
+tests/
+*.egg-info/
+dist/
+build/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+i2.sqlite

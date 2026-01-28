@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Unidentied salvage tracking app for GW2."
 dependencies = [
   "flask",
+  "gunicorn",
 ]
 
 [build-system]
